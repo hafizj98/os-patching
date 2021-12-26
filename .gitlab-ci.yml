@@ -1,0 +1,8 @@
+image: registry.gitlab.kamil.net:5000/ansible:v2.10.16
+
+test:
+  stage: test
+  script:
+    - ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook /builds/kamil/patch/ansible/playbook.yml
+  tags:
+    - test
