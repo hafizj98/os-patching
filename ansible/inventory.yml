@@ -1,0 +1,9 @@
+---
+all:
+  vars:
+    set_release: "8.5"
+    reboot_servers: "no"
+  children:
+    TEST:
+      hosts:
+        192.168.0.136:

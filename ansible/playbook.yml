@@ -1,0 +1,4 @@
+---
+- hosts: "{{ HOST }}"
+  roles:
+    - role: patching
