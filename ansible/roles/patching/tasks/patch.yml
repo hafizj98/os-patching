@@ -1,0 +1,74 @@
+---
+- name: Query update packages with exclude
+  shell: yum check-update --exclude={{ exclude_packages }} > /tmp/list-packages
+  ignore_errors: true
+  when: exclude_packages is defined
+  tags: 
+    - pre_patch
+
+- name: Query update packages
+  shell: yum check-update > /tmp/list-packages
+  ignore_errors: true
+  when: exclude_packages is not defined
+  tags: 
+    - pre_patch
+
+- name: Get Update packages
+  command: cat /tmp/list-packages
+  register: list_update_packages
+
+- name: List update packages
+  debug:
+    msg: "{{ list_update_packages.stdout_lines }}"
+
+- name: Request confirmation
+  pause:
+    prompt: |
+
+      The packages listed above will be upgraded. Do you want to continue ? 
+      -> Press RETURN to continue.
+      -> Press Ctrl+c and then "a" to abort.
+  tags: pre_patch      
+
+- name: Run update
+  yum:
+    name: '*'
+    exclude: "{{ exclude_packages }}"
+    state: latest
+  when: exclude_packages is defined
+  tags: 
+    - run_patch
+
+- name: Run update
+  yum:
+    name: '*'
+    state: latest
+  when: exclude_packages is not defined
+  tags: 
+    - run_patch
+
+- name: Reboot server
+  reboot:
+    test_command: whoami
+    reboot_timeout: 3600
+  when: reboot_server == "yes"
+
+- name: Check kernel version
+  command: uname -r
+  register: check_kernel_version
+  tags: 
+    - post_patch
+
+- name: Check release
+  command: subscription-manager release --show
+  register: check_release
+  tags: 
+    - post_patch
+
+- debug:
+    msg: "{{ item }}"
+  loop:
+    - "{{ ansible_fqdn }} kernel version is {{ check_kernel_version.stdout }}"
+    - "{{ ansible_fqdn }} {{ check_release.stdout }}"
+  tags: 
+    - post_patch
