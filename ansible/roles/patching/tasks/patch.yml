@@ -52,6 +52,8 @@
     test_command: whoami
     reboot_timeout: 3600
   when: reboot_server == "yes"
+  tags:
+    - reboot_server
 
 - name: Check kernel version
   command: uname -r
