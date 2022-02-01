@@ -1,4 +1,9 @@
 ---
 - hosts: "{{ HOST }}"
+  vars:
+    ansible_user: root
+    ansible_ssh_pass: q
+    ansible_pass: q
   roles:
     - role: patching
+

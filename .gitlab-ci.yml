@@ -1,8 +1,17 @@
 image: registry.gitlab.kamil.net:5000/ansible:v2.10.16
 
-test:
+dry_run:
   stage: test
   script:
-    - ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i /builds/kamil/patch/ansible/inventory.yml -e "HOST=TEST" /builds/kamil/patch/ansible/playbook.yml
+    - ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i /builds/kamil/patch/ansible/inventory.yml -e "HOST=TEST" /builds/kamil/patch/ansible/playbook.yml --tags pre_tasks
   tags:
     - test
+
+deploy_patch:
+  stage: deploy
+  script:
+    - ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i /builds/kamil/patch/ansible/inventory.yml -e "HOST=TEST" /builds/kamil/patch/ansible/playbook.yml --tags run_patch,post_patch
+  when: manual
+  only:
+    refs:
+      - master
