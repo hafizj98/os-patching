@@ -1,4 +1,4 @@
-# This role is to patch API Gateway servers
+# This role is to patch servers
 
 **Setting inventory**
 ```yaml
